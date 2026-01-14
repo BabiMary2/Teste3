@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Controle da Academia</title>
+
+<style>
+:root {
+  --primary: #38bdf8;
+  --secondary: #0ea5e9;
+  --success: #064e3b;
+  --danger: #450a0a;
+
+  --bg: #1f2933;
+  --card: #2b3440;
+  --border: #3f4a59;
+  --text: #f1f5f9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 30px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1300px;
+  margin: auto;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: linear-gradient(
+      rgba(0,0,0,0.7),
+      rgba(0,0,0,0.7)
+    ),
+    url("https://images.unsplash.com/photo-1583454110551-21f2fa2afe61");
+  background-size: cover;
+  background-position: center;
+  border-radius: 18px;
+  padding: 40px 30px;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.header-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 56px;
+}
+
+.titulo h1 {
+  margin: 0;
+  font-size: 42px;
+  letter-spacing: 2px;
+}
+
+.titulo span {
+  color: var(--primary);
+}
+
+.titulo p {
+  margin: 6px 0 0;
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  margin-bottom: 25px;
+}
+
+h2 {
+  color: var(--primary);
+  margin: 0;
+}
+
+/* ===== TOGGLE ===== */
+.toggle {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seta {
+  font-size: 18px;
+}
+
+.conteudo {
+  margin-top: 15px;
+}
+
+.conteudo.fechado {
+  display: none;
+}
+
+/* ===== FORM ===== */
+.periodo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+input, select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  background: #1f2937;
+  color: var(--text);
+}
+
+input::placeholder {
+  color: #9ca3af;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--primary);
+  color: #020617;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--secondary);
+}
+
+.busca {
+  max-width: 300px;
+  margin: 10px 0;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+th {
+  background: #374151;
+  color: #f9fafb;
+}
+
+tr:hover {
+  background: #374151;
+}
+
+.linha-paga { background: var(--success); }
+.linha-nao-paga { background: var(--danger); }
+
+/* ===== RESUMO ===== */
+.resumo p {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.resumo strong {
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .periodo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-conteudo">
+    <div class="logo">🏋️</div>
+    <div class="titulo">
+      <h1>ATLAS <span>ACADEMIA</span></h1>
+      <p>Controle financeiro e administrativo</p>
+    </div>
+  </div>
+</div>
+
+<!-- PERÍODO -->
+<div class="card">
+  <div class="periodo">
+    <strong>📅 Período:</strong>
+    <select id="mes" onchange="carregarDados()">
+      <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+      <option value="03">Março</option><option value="04">Abril</option>
+      <option value="05">Maio</option><option value="06">Junho</option>
+      <option value="07">Julho</option><option value="08">Agosto</option>
+      <option value="09">Setembro</option><option value="10">Outubro</option>
+      <option value="11">Novembro</option><option value="12">Dezembro</option>
+    </select>
+    <input type="number" id="ano" value="2026" onchange="carregarDados()">
+  </div>
+</div>
+
+<!-- ALUNOS -->
+<div class="card">
+  <h2 class="toggle" onclick="toggleCard(this)">👥 Alunos <span class="seta">▶</span></h2>
+  <div class="conteudo fechado">
+    <input class="busca" placeholder="Buscar aluno..." oninput="filtrarTabela('alunos',0,this.value)">
+    <br>
+    <button onclick="ordenarTabela('alunos',0)">Ordenar A–Z</button>
+
+    <table id="alunos">
+      <tr>
+        <th>Nome</th><th>Celular</th><th>Mensalidade</th>
+        <th>Vencimento</th><th>Pagamento</th><th>Pago?</th><th>Ação</th>
+      </tr>
+    </table>
+
+    <button onclick="addLinha('alunos')">Adicionar Aluno</button>
+    <button onclick="copiarAlunos()">Copiar de outro mês</button>
+  </div>
+</div>
+
+<!-- GASTOS -->
+<div class="card">
+  <h2 class="toggle" onclick="toggleCard(this)">💸 Gastos <span class="seta">▶</span></h2>
+  <div class="conteudo fechado">
+    <table id="gastos">
+      <tr><th>Descrição</th><th>Valor</th><th>Data</th><th>Ação</th></tr>
+    </table>
+    <button onclick="addLinha('gastos')">Adicionar Gasto</button>
+  </div>
+</div>
+
+<!-- VENDAS -->
+<div class="card">
+  <h2 class="toggle" onclick="toggleCard(this)">🛒 Vendas <span class="seta">▶</span></h2>
+  <div class="conteudo fechado">
+    <input class="busca" placeholder="Buscar comprador..." oninput="filtrarTabela('venda',2,this.value)">
+    <br>
+    <button onclick="ordenarTabela('venda',2)">Ordenar A–Z</button>
+
+    <table id="venda">
+      <tr>
+        <th>Produto</th><th>Valor</th><th>Comprador</th>
+        <th>Celular</th><th>Compra</th><th>Pagamento</th><th>Pago?</th><th>Ação</th>
+      </tr>
+    </table>
+
+    <button onclick="addLinha('venda')">Adicionar Venda</button>
+  </div>
+</div>
+
+<!-- RESUMO -->
+<div class="card resumo">
+  <h2>📊 Resumo</h2>
+  <p>Quantidade de alunos: <strong><span id="qtdAlunos">0</span></strong></p>
+  <p>Alunos pagos: <strong><span id="qtdAlunosPagos">0</span></strong></p>
+  <p>Mensalidades: R$ <strong><span id="totalAlunos">0</span></strong></p>
+  <p>Vendas: R$ <strong><span id="totalVenda">0</span></strong></p>
+  <p>Gastos: R$ <strong><span id="totalGastos">0</span></strong></p>
+  <hr>
+  <p><strong>Lucro: R$ <span id="lucro">0</span></strong></p>
+</div>
+
+</div>
+
+<script>
+function toggleCard(titulo){
+  const conteudo = titulo.nextElementSibling;
+  const seta = titulo.querySelector(".seta");
+  conteudo.classList.toggle("fechado");
+  seta.textContent = conteudo.classList.contains("fechado") ? "▶" : "▼";
+}
+
+function chavePeriodo(){ return ano.value+"-"+mes.value }
+
+function filtrarTabela(id,col,texto){
+  texto = texto.toLowerCase();
+  [...document.getElementById(id).rows].slice(1).forEach(r=>{
+    const v = r.cells[col].querySelector("input")?.value.toLowerCase() || "";
+    r.style.display = v.includes(texto) ? "" : "none";
+  });
+}
+
+function ordenarTabela(id,col){
+  const t=document.getElementById(id);
+  const linhas=[...t.rows].slice(1);
+  linhas.sort((a,b)=>{
+    const A=a.cells[col].querySelector("input")?.value.toLowerCase()||"";
+    const B=b.cells[col].querySelector("input")?.value.toLowerCase()||"";
+    return A.localeCompare(B,"pt-BR");
+  });
+  linhas.forEach(l=>t.appendChild(l));
+}
+
+function atualizarCorLinha(sel){
+  const tr=sel.closest("tr");
+  tr.classList.remove("linha-paga","linha-nao-paga");
+  sel.value==="sim" ? tr.classList.add("linha-paga") : tr.classList.add("linha-nao-paga");
+}
+
+function addLinha(tipo){
+  const t=document.getElementById(tipo);
+  const r=t.insertRow(-1);
+  const txt='onblur="salvarDados()"';
+
+  if(tipo==="alunos"){
+    r.innerHTML=`
+      <td><input ${txt}></td>
+      <td><input ${txt}></td>
+      <td><input type="number" ${txt}></td>
+      <td><input type="date" ${txt}></td>
+      <td><input type="date" ${txt}></td>
+      <td>
+        <select onchange="atualizarCorLinha(this);salvarDados()">
+          <option value="não">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+      </td>
+      <td><button onclick="this.closest('tr').remove();salvarDados()">Excluir</button></td>
+    `;
+  }
+
+  if(tipo==="gastos"){
+    r.innerHTML=`
+      <td><input ${txt}></td>
+      <td><input type="number" ${txt}></td>
+      <td><input type="date" ${txt}></td>
+      <td><button onclick="this.closest('tr').remove();salvarDados()">Excluir</button></td>
+    `;
+  }
+
+  if(tipo==="venda"){
+    r.innerHTML=`
+      <td><input ${txt}></td>
+      <td><input type="number" ${txt}></td>
+      <td><input ${txt}></td>
+      <td><input ${txt}></td>
+      <td><input type="date" ${txt}></td>
+      <td><input type="date" ${txt}></td>
+      <td>
+        <select onchange="atualizarCorLinha(this);salvarDados()">
+          <option value="não">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+      </td>
+      <td><button onclick="this.closest('tr').remove();salvarDados()">Excluir</button></td>
+    `;
+  }
+}
+
+function salvarDados(){
+  const d={alunos:[],gastos:[],venda:[]};
+
+  [...alunos.rows].slice(1).forEach(r=>{
+    const i=r.querySelectorAll("input,select");
+    d.alunos.push({
+      nome:i[0].value, cel:i[1].value, valor:i[2].value,
+      compra:i[3].value, pagamento:i[4].value, pago:i[5].value
+    });
+  });
+
+  [...gastos.rows].slice(1).forEach(r=>{
+    const i=r.querySelectorAll("input");
+    d.gastos.push({desc:i[0].value,valor:i[1].value,data:i[2].value});
+  });
+
+  [...venda.rows].slice(1).forEach(r=>{
+    const i=r.querySelectorAll("input,select");
+    d.venda.push({
+      prod:i[0].value, valor:i[1].value, comprador:i[2].value,
+      cel:i[3].value, compra:i[4].value, pagamento:i[5].value, pago:i[6].value
+    });
+  });
+
+  localStorage.setItem("academia_"+chavePeriodo(),JSON.stringify(d));
+  calcular();
+}
+
+function carregarDados(){
+  ["alunos","gastos","venda"].forEach(id=>{
+    const t=document.getElementById(id);
+    while(t.rows.length>1)t.deleteRow(1);
+  });
+
+  const d=JSON.parse(localStorage.getItem("academia_"+chavePeriodo()));
+  if(!d)return calcular();
+
+  d.alunos.forEach(a=>{
+    addLinha("alunos");
+    const i=alunos.rows[alunos.rows.length-1].querySelectorAll("input,select");
+    i[0].value=a.nome;i[1].value=a.cel;i[2].value=a.valor;
+    i[3].value=a.compra;i[4].value=a.pagamento;i[5].value=a.pago;
+    atualizarCorLinha(i[5]);
+  });
+
+  d.gastos.forEach(g=>{
+    addLinha("gastos");
+    const i=gastos.rows[gastos.rows.length-1].querySelectorAll("input");
+    i[0].value=g.desc;i[1].value=g.valor;i[2].value=g.data;
+  });
+
+  d.venda.forEach(v=>{
+    addLinha("venda");
+    const i=venda.rows[venda.rows.length-1].querySelectorAll("input,select");
+    i[0].value=v.prod;i[1].value=v.valor;i[2].value=v.comprador;
+    i[3].value=v.cel;i[4].value=v.compra;i[5].value=v.pagamento;i[6].value=v.pago;
+    atualizarCorLinha(i[6]);
+  });
+
+  calcular();
+}
+
+function calcular(){
+  let a=0,s=0,g=0;
+  let qtd=0;
+
+  // ADICIONADO
+  let qtdPagos = 0;
+
+  [...alunos.rows].slice(1).forEach(r=>{
+    qtd++;
+    if(r.querySelector("select").value==="sim"){
+      qtdPagos++;
+      a+=Number(r.querySelector("input[type=number]").value)||0;
+    }
+  });
+
+  [...venda.rows].slice(1).forEach(r=>{
+    if(r.querySelector("select").value==="sim")
+      s+=Number(r.querySelector("input[type=number]").value)||0;
+  });
+
+  [...gastos.rows].slice(1).forEach(r=>{
+    g+=Number(r.querySelector("input[type=number]").value)||0;
+  });
+
+  qtdAlunos.textContent=qtd;
+
+  // ADICIONADO
+  qtdAlunosPagos.textContent=qtdPagos;
+
+  totalAlunos.textContent=a.toFixed(2);
+  totalVenda.textContent=s.toFixed(2);
+  totalGastos.textContent=g.toFixed(2);
+  lucro.textContent=(a+s-g).toFixed(2);
+}
+
+carregarDados();
+
+function copiarAlunos(){
+  const m = prompt("Mês origem (01-12):");
+  const a = prompt("Ano origem:");
+  if(!m || !a) return;
+
+  const dadosOrigem = JSON.parse(
+    localStorage.getItem("academia_" + a + "-" + m)
+  );
+
+  if(!dadosOrigem || !dadosOrigem.alunos.length){
+    alert("Sem alunos nesse período");
+    return;
+  }
+
+  const mesAtual = parseInt(mes.value, 10);
+  const anoAtual = parseInt(ano.value, 10);
+  const ultimoDiaMes = new Date(anoAtual, mesAtual, 0).getDate();
+
+  dadosOrigem.alunos.forEach(al => {
+    addLinha("alunos");
+
+    const r = alunos.rows[alunos.rows.length - 1];
+    const i = r.querySelectorAll("input,select");
+
+    let dia = 1;
+
+    if(al.pagamento){
+      dia = parseInt(al.pagamento.split("-")[2], 10);
+    } else if(al.compra){
+      dia = parseInt(al.compra.split("-")[2], 10);
+    }
+
+    if(dia > ultimoDiaMes) dia = ultimoDiaMes;
+
+    const diaStr = String(dia).padStart(2, "0");
+    const mesStr = String(mesAtual).padStart(2, "0");
+
+    const novoVencimento = `${anoAtual}-${mesStr}-${diaStr}`;
+
+    i[0].value = al.nome;
+    i[1].value = al.cel;
+    i[2].value = al.valor;
+    i[3].value = novoVencimento;
+    i[4].value = "";
+    i[5].value = "não";
+
+    atualizarCorLinha(i[5]);
+  });
+
+  salvarDados();
+}
+
+</script>
+</body>
+</html>
